@@ -1,0 +1,32 @@
+#!/bin/sh -e
+
+if [ -z "$(snapctl get url)" ]; then
+	snapctl set url="http://localhost:9400";
+fi
+
+if [ -z "$(snapctl get devmode)" ]; then
+	snapctl set devmode=false;
+fi
+
+if [ -z "$(snapctl get debug)" ]; then
+	snapctl set debug=false;
+fi
+
+if [ -z "$(snapctl get error-to-console)" ]; then
+	snapctl set error-to-console=false;
+fi
+
+if [ -z "$(snapctl get bgcolor)" ]; then
+	snapctl set bgcolor=black;
+fi
+
+if [ -z "$(snapctl get inspector-server-port)" ]; then
+	snapctl set inspector-server-port=9080;
+fi
+
+if [ -z "$(snapctl get inspector-http-server-port)" ]; then
+	snapctl set inspector-http-server-port=9090;
+fi
+
+snapctl restart "$SNAP_INSTANCE_NAME"
+

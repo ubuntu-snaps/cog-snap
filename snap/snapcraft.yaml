@@ -1,0 +1,225 @@
+name: cog-kiosk
+version: 0.17.1
+summary: cog wpewebkit browser
+description: cog wpewebkit browser
+
+base: core22
+confinement: strict
+grade: stable
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
+
+plugs:
+  audio-playback:
+  audio-record:
+  network:
+  network-bind:
+  opengl:
+  wayland:
+  graphics-core22:
+    interface: content
+    target: $SNAP/graphics
+    default-provider: mesa-core22
+
+layout:
+  /usr/libexec/wpe-webkit-2.0:
+    bind: $SNAP/usr/libexec/wpe-webkit-2.0
+  /usr/lib/$CRAFT_ARCH_TRIPLET/wpe-webkit-2.0:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/wpe-webkit-2.0
+  /usr/lib/$CRAFT_ARCH_TRIPLET/cog:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/cog
+  /usr/share/libdrm:
+    bind: $SNAP/graphics/usr/share/libdrm
+  /usr/share/drirc.d:
+    bind: $SNAP/graphics/usr/share/drirc.d
+  /usr/share/X11:
+    bind: $SNAP/usr/share/X11
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
+  /usr/share/fonts:
+    bind: $SNAP/usr/share/fonts
+  /etc/fonts:
+    bind: $SNAP/etc/fonts
+
+environment:
+  LC_ALL: C.UTF-8
+  GIO_MODULE_DIR: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gio/modules
+  GST_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gstreamer-1.0
+  GST_PLUGIN_SYSTEM_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gstreamer-1.0
+  GST_PLUGIN_SCANNER: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner
+
+apps:
+  daemon:
+    command-chain:
+      - bin/graphics-core22-wrapper
+      - bin/wayland-launch
+    command: bin/launch-cog
+    daemon: simple
+    restart-condition: always
+    environment:
+      XDG_DATA_HOME: ${SNAP_DATA}/usr/share
+      XDG_CONFIG_HOME: ${SNAP_DATA}/.config
+      XDG_DATA_DIRS: ${SNAP_COMMON}/usr/share:${SNAP}/usr/share:$XDG_DATA_DIRS
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:${XDG_CONFIG_DIRS}
+      XDG_CACHE_HOME: ${SNAP_COMMON}/.cache
+      WPE_SHELL_MEDIA_DISK_CACHE_PATH: ${XDG_CACHE_HOME}  
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/blas:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/lapack
+  cog:
+    command-chain:
+      - bin/graphics-core22-wrapper
+    command: usr/bin/cog
+    environment:
+      XDG_DATA_HOME: ${SNAP_USER_DATA}/usr/share
+      XDG_CONFIG_HOME: ${SNAP_USER_DATA}/.config
+      XDG_DATA_DIRS: ${SNAP_USER_COMMON}/usr/share:${SNAP}/usr/share:${XDG_DATA_DIRS}
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_CACHE_HOME: ${SNAP_USER_COMMON}/.cache
+      WPE_SHELL_MEDIA_DISK_CACHE_PATH: ${XDG_CACHE_HOME}
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/blas:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/lapack
+  cogctl:
+    command: usr/bin/cogctl
+
+parts:
+  libwpe:
+    source: https://wpewebkit.org/releases/libwpe-1.14.1.tar.xz
+    plugin: meson
+    meson-parameters:
+      - --buildtype=release
+      - --prefix=/usr
+    build-packages:
+      - libxkbcommon-dev
+    stage-packages:
+      - libxkbcommon0
+  wpebackend-fdo:
+    after: [libwpe]
+    source: https://wpewebkit.org/releases/wpebackend-fdo-1.14.2.tar.xz
+    plugin: meson
+    meson-parameters:
+      - --buildtype=release
+      - --prefix=/usr
+  wpewebkit:
+    after: [libwpe, wpebackend-fdo]
+    source: https://wpewebkit.org/releases/wpewebkit-2.40.1.tar.xz
+    plugin: cmake
+    cmake-generator: Ninja
+    cmake-parameters:
+      - -DPORT=WPE
+      - -DCMAKE_INSTALL_PREFIX:PATH=/usr
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DENABLE_DOCUMENTATION=OFF
+      - -DENABLE_INTROSPECTION=OFF  
+      - -DENABLE_BUBBLEWRAP_SANDBOX=OFF
+      - -DCMAKE_BUILD_RPATH="${CRAFT_STAGE}/usr/lib/${CRAFT_ARCH_TRIPLET}"
+    build-packages:
+      - gperf
+      - libavif-dev
+      - libdrm-dev
+      - libgbm-dev
+      - libgcrypt20-dev
+      - libgnutls28-dev
+      - libgstreamer-plugins-bad1.0-dev
+      - libgstreamer-plugins-base1.0-dev
+      - libharfbuzz-dev
+      - libicu-dev
+      - libjpeg8-dev
+      - liblcms2-dev
+      - libopenjp2-7-dev
+      - libsoup-3.0-dev
+      - libsqlite3-dev        
+      - libsystemd-dev
+      - libtasn1-6-dev
+      - libwebp-dev
+      - libwoff-dev
+      - libxml2-dev
+      - libxslt1-dev
+      - ruby-dev
+      - unifdef
+    stage-packages:
+      - gstreamer1.0-gl
+      - gstreamer1.0-libav
+      - gstreamer1.0-plugins-bad
+      - gstreamer1.0-plugins-base
+      - gstreamer1.0-plugins-base-apps
+      - gstreamer1.0-plugins-good
+      - libatk1.0-0
+      - libatomic1
+      - libavif13
+      - libgbm1
+      - libgcrypt20
+      - libgstreamer-gl1.0-0
+      - libharfbuzz0b
+      - libharfbuzz-icu0
+      - libicu70
+      - libjpeg8
+      - liblcms2-2
+      - libopenjp2-7
+      - libsoup-3.0-0
+      - libsqlite3-0
+      - libsystemd0
+      - libtasn1-6
+      - libwebp7
+      - libwebpdemux2
+      - libwoff1
+      - libxml2
+      - libxslt1.1
+  cog:
+    after: [wpewebkit]
+    source: https://wpewebkit.org/releases/cog-0.17.1.tar.xz
+    plugin: meson
+    meson-parameters:
+      - --buildtype=release
+      - --prefix=/usr
+      - -Dplatforms=wayland
+      - -Dcog_dbus_control=system
+    build-environment:
+      - LD_LIBRARY_PATH: $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET
+    build-packages:
+      - execstack
+      - libcairo2-dev
+      - libepoxy-dev
+      - libmanette-0.2-dev
+      - libwayland-dev
+      - meson
+      - wayland-protocols
+    stage-packages:
+      - fonts-droid-fallback
+      - glib-networking
+      - libcairo2
+      - libepoxy0
+      - libmanette-0.2-0
+      - shared-mime-info
+    override-stage: |
+      craftctl default
+      if [ $CRAFT_TARGET_ARCH == "armhf" ]; then
+        execstack --clear-execstack usr/lib/$CRAFT_ARCH_TRIPLET/libde265.so.*
+      fi
+    override-prime: |
+      craftctl default
+      usr/bin/update-mime-database usr/share/mime
+      glib-compile-schemas usr/share/glib-2.0/schemas
+  graphics-core22:
+    after: [cog]
+    source: https://github.com/MirServer/graphics-core22.git
+    plugin: dump
+    override-prime: |
+      craftctl default
+      ${CRAFT_PART_SRC}/bin/graphics-core22-cleanup mesa-core22 nvidia-core22
+    prime:
+      - bin/graphics-core22-wrapper
+  wayland-launch:
+    plugin: dump
+    source: wayland-launch
+    override-build: |
+      PLUGS="opengl wayland graphics-core22"
+      sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/wayland-launch
+      sed --in-place "s/%PLUGS%/$PLUGS/g" $CRAFT_PART_BUILD/bin/setup.sh
+      snapcraftctl build
+    stage-packages:
+      - inotify-tools
+  launcher:
+    plugin: dump
+    source: launcher
+

@@ -1,0 +1,10 @@
+#!/bin/sh -e
+snapctl set \
+	url="http://localhost:9400" \
+	devmode="false" \
+	debug="false" \
+	error-to-console="false" \
+	bgcolor="black" \
+	inspector-server-port=9080 \
+	inspector-http-server-port=9090
+

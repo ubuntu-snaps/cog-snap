@@ -11,6 +11,12 @@ grade: stable
 platforms:
   amd64:
 
+slots:
+  dbus-cogctl:
+    interface: dbus
+    bus: system
+    name: com.igalia.Cog
+
 plugs:
   gpu-2404:
     interface: content
@@ -42,6 +48,8 @@ apps:
     command: bin/launch-cog
     daemon: simple
     restart-condition: always
+    slots:
+      - dbus-cogctl
     plugs:
       - audio-playback
       - audio-record

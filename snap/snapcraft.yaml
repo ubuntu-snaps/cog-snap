@@ -36,7 +36,7 @@ layout:
   /usr/share/libdrm:
     bind: $SNAP/gpu-2404/libdrm
   /usr/share/X11:
-    bind: $SNAP/gpu-2404/X11
+    bind: $SNAP/usr/share/X11
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
   /etc/fonts:
@@ -52,9 +52,10 @@ apps:
     ## Require Manunal Review
     # slots:
     #   - dbus-cogctl
-    plugs:
+    plugs: &plugs
       - audio-playback
       - audio-record
+      - hardware-observe
       - network
       - network-bind
       - opengl
@@ -70,13 +71,7 @@ apps:
     command-chain:
       - bin/gpu-2404-wrapper
     command: bin/launch-cog
-    plugs:
-      - audio-playback
-      - audio-record
-      - network
-      - network-bind
-      - opengl
-      - wayland
+    plugs: *plugs
     environment:
       XDG_DATA_HOME: ${SNAP_USER_DATA}/usr/share
       XDG_CONFIG_HOME: ${SNAP_USER_DATA}/.config
@@ -204,6 +199,7 @@ parts:
       - libatomic1
       - libmanette-0.2-0
       - libinput10
+      - xkb-data
     override-prime: |
       craftctl default
       ln -s libWPEBackend-fdo-1.0.so ${CRAFT_PRIME}/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libWPEBackend-default.so

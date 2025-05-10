@@ -2,6 +2,7 @@ name: cog-kiosk
 summary: cog wpewebkit browser
 description: cog wpewebkit browser
 version: 0.18.4
+adopt-info: launcher
 
 base: core24
 confinement: strict
@@ -208,3 +209,6 @@ parts:
   launcher:
     plugin: dump
     source: launcher
+    override-stage: |
+      craftctl default
+      craftctl set version="$(craftctl get version)-$(git rev-parse --short HEAD)"

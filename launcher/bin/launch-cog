@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+platform="$(snapctl get platform)"
 url="$(snapctl get url)"
 devmode="$(snapctl get devmode)"
 debug="$(snapctl get debug)"
@@ -26,14 +27,9 @@ if [[ -z "$bgcolor" ]]; then
 	bgcolor=black
 fi
 
-if [ ! -f "$SNAP_USER_DATA/cog.ini" ]; then
-	touch "$SNAP_USER_DATA/cog.ini"
-fi
-
 $SNAP/usr/bin/cog \
-	-P wl \
+	--platform=$platform \
 	--bg-color="$bgcolor" \
-	--config="$SNAP_USER_DATA/cog.ini" \
 	--enable-mediasource=1 \
 	--enable-write-console-messages-to-stdout="$error_to_console" \
 	"$url"

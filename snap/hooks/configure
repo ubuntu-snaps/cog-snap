@@ -1,5 +1,9 @@
 #!/bin/sh -e
 
+if [ -z "$(snapctl get platform)" ]; then
+	snapctl set platform="wl";
+fi
+
 if [ -z "$(snapctl get url)" ]; then
 	snapctl set url="http://localhost:9400";
 fi

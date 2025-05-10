@@ -1,5 +1,6 @@
 #!/bin/sh -e
 snapctl set \
+	platform="wl" \
 	url="http://localhost:9400" \
 	devmode="false" \
 	debug="false" \

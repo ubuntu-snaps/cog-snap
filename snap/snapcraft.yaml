@@ -23,16 +23,14 @@ layout:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/wpe-webkit-2.0
   /usr/lib/$CRAFT_ARCH_TRIPLET/cog:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/cog
-  /usr/share/libdrm:
-    bind: $SNAP/gpu-2404/usr/share/libdrm
+  /usr/share:
+    bind: $SNAP/usr/share
   /usr/share/drirc.d:
-    bind: $SNAP/gpu-2404/usr/share/drirc.d
+    bind: $SNAP/gpu-2404/drirc.d
+  /usr/share/libdrm:
+    bind: $SNAP/gpu-2404/libdrm
   /usr/share/X11:
-    bind: $SNAP/usr/share/X11
-  /usr/share/alsa:
-    bind: $SNAP/usr/share/alsa
-  /usr/share/fonts:
-    bind: $SNAP/usr/share/fonts
+    bind: $SNAP/gpu-2404/X11
   /etc/fonts:
     bind: $SNAP/etc/fonts
 

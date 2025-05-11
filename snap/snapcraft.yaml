@@ -46,6 +46,7 @@ layout:
 
 environment:
   LC_ALL: C.UTF-8
+  LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libproxy
   GIO_MODULE_DIR: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gio/modules
   GST_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gstreamer-1.0
   GST_PLUGIN_SYSTEM_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gstreamer-1.0
@@ -207,12 +208,16 @@ parts:
       - fonts-droid-fallback
       - glib-networking
       - libatomic1
-      - libmanette-0.2-0
       - libinput10
+      - libmanette-0.2-0
+      - libproxy1v5
+      - shared-mime-info
       - xkb-data
     override-prime: |
       craftctl default
-      ln -s libWPEBackend-fdo-1.0.so ${CRAFT_PRIME}/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libWPEBackend-default.so
+      ln -sf libWPEBackend-fdo-1.0.so ${CRAFT_PRIME}/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libWPEBackend-default.so
+      usr/bin/update-mime-database usr/share/mime
+      glib-compile-schemas usr/share/glib-2.0/schemas
   gpu-2404:
     after: [cog]
     source: https://github.com/canonical/gpu-snap.git
@@ -227,4 +232,4 @@ parts:
     source: launcher
     override-stage: |
       craftctl default
-      craftctl set version="$(craftctl get version)-$(git rev-parse --short HEAD)"
+      craftctl set version="$(craftctl get version)+$(git rev-parse --short HEAD)"

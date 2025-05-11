@@ -27,9 +27,9 @@ plugs:
 layout:
   /usr/libexec/wpe-webkit-2.0:
     bind: $SNAP/usr/libexec/wpe-webkit-2.0
-  /usr/lib/$CRAFT_ARCH_TRIPLET/wpe-webkit-2.0:
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/wpe-webkit-2.0:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/wpe-webkit-2.0
-  /usr/lib/$CRAFT_ARCH_TRIPLET/cog:
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/cog:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/cog
   /usr/share/drirc.d:
     bind: $SNAP/gpu-2404/drirc.d
@@ -39,8 +39,17 @@ layout:
     bind: $SNAP/usr/share/X11
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
+  /usr/share/fonts-droid-fallback:
+    bind: $SNAP/usr/share/fonts-droid-fallback
   /etc/fonts:
     bind: $SNAP/etc/fonts
+
+environment:
+  LC_ALL: C.UTF-8
+  GIO_MODULE_DIR: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gio/modules
+  GST_PLUGIN_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gstreamer-1.0
+  GST_PLUGIN_SYSTEM_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gstreamer-1.0
+  GST_PLUGIN_SCANNER: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner
 
 apps:
   daemon:
@@ -62,10 +71,10 @@ apps:
       - wayland
     environment:
       XDG_DATA_HOME: ${SNAP_DATA}/usr/share
-      XDG_CONFIG_HOME: ${SNAP_DATA}/.config
+      XDG_CONFIG_HOME: ${SNAP_DATA}/config
       XDG_DATA_DIRS: ${SNAP_COMMON}/usr/share:${SNAP}/usr/share:$XDG_DATA_DIRS
       XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:${XDG_CONFIG_DIRS}
-      XDG_CACHE_HOME: ${SNAP_COMMON}/.cache
+      XDG_CACHE_HOME: ${SNAP_COMMON}/cache
       WPE_SHELL_MEDIA_DISK_CACHE_PATH: ${XDG_CACHE_HOME}
   cog:
     command-chain:
@@ -74,10 +83,10 @@ apps:
     plugs: *plugs
     environment:
       XDG_DATA_HOME: ${SNAP_USER_DATA}/usr/share
-      XDG_CONFIG_HOME: ${SNAP_USER_DATA}/.config
+      XDG_CONFIG_HOME: ${SNAP_USER_DATA}/config
       XDG_DATA_DIRS: ${SNAP_USER_COMMON}/usr/share:${SNAP}/usr/share:${XDG_DATA_DIRS}
       XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-      XDG_CACHE_HOME: ${SNAP_USER_COMMON}/.cache
+      XDG_CACHE_HOME: ${SNAP_USER_COMMON}/cache
       WPE_SHELL_MEDIA_DISK_CACHE_PATH: ${XDG_CACHE_HOME}
   cogctl:
     command: usr/bin/cogctl
@@ -196,6 +205,7 @@ parts:
       - libinput-dev
     stage-packages:
       - fonts-droid-fallback
+      - glib-networking
       - libatomic1
       - libmanette-0.2-0
       - libinput10

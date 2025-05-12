@@ -37,6 +37,8 @@ layout:
     bind: $SNAP/gpu-2404/libdrm
   /usr/share/X11:
     bind: $SNAP/usr/share/X11
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
   /usr/share/fonts-droid-fallback:
@@ -232,4 +234,4 @@ parts:
     source: launcher
     override-stage: |
       craftctl default
-      craftctl set version="$(craftctl get version)+$(git rev-parse --short HEAD)"
+      craftctl set version="$(craftctl get version)+git$(git rev-parse --short HEAD)"

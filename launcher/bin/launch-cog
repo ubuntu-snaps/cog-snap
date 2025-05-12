@@ -27,9 +27,10 @@ if [[ -z "$bgcolor" ]]; then
 	bgcolor=black
 fi
 
-$SNAP/usr/bin/cog \
+exec $SNAP/usr/bin/cog \
 	--platform=$platform \
 	--bg-color="$bgcolor" \
+	--enable-developer-extras \
 	--enable-mediasource=1 \
 	--enable-write-console-messages-to-stdout="$error_to_console" \
 	"$url"
